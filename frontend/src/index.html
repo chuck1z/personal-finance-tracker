@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Statement OCR Processor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏦 Bank Statement OCR Processor</h1>
+            <p>Upload your bank statement PDF or image to extract transaction data automatically</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Drag & Drop your bank statement here</div>
+                <div class="upload-subtext">or click to browse (PDF, PNG, JPG, JPEG - Max 16MB)</div>
+            </div>
+            <input type="file" id="file-input" accept=".pdf,.png,.jpg,.jpeg">
+            
+            <div class="file-info" id="file-info">
+                <strong>Selected File:</strong> <span id="file-name"></span>
+                <br>
+                <strong>Size:</strong> <span id="file-size"></span>
+            </div>
+
+            <button class="process-btn" id="process-btn" style="display: none;">
+                Process Statement
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your statement... This may take a moment.</p>
+            </div>
+
+            <div class="error-message" id="error-message"></div>
+            <div class="success-message" id="success-message"></div>
+        </div>
+
+        <div class="results-section" id="results-section">
+            <div class="result-card">
+                <div class="result-header">
+                    <h2>Account Information</h2>
+                </div>
+                <div class="info-grid" id="account-info-grid">
+                    <!-- Account info will be populated here -->
+                </div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-header">
+                    <h2>Extracted Transactions</h2>
+                </div>
+                <div id="transactions-summary">
+                    <p>Total Transactions Found: <span id="transaction-count">0</span></p>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="transactions-table" id="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-tbody">
+                            <!-- Transactions will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="export-buttons">
+                    <button class="export-btn" id="export-csv">Export as CSV</button>
+                    <button class="export-btn" id="export-json">Export as JSON</button>
+                    <button class="export-btn" id="show-raw">Show Raw Text</button>
+                </div>
+            </div>
+
+            <div class="result-card" id="raw-text-card" style="display: none;">
+                <div class="result-header">
+                    <h2>Raw Extracted Text (Preview)</h2>
+                </div>
+                <div class="raw-text-content">
+                    <pre id="raw-text-preview"></pre>
+                </div>
+                <button class="export-btn" id="hide-raw">Hide Raw Text</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Powered by Tesseract OCR | Processing is done locally for your privacy</p>
+        </div>
+    </div>
+
+    <!-- Modal for confirmations -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="modal-title">Confirmation</h3>
+            <p id="modal-message"></p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-confirm" id="modal-confirm">Confirm</button>
+                <button class="modal-btn modal-cancel" id="modal-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

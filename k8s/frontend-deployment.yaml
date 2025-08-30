@@ -1,0 +1,36 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: bank-ocr
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: finanalyze-frontend:latest # Assuming you will build and push this image
+          imagePullPolicy: Never # Use Never for local Kind cluster with locally built images
+          envFrom:
+            - configMapRef:
+                name: frontend-config
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - name: frontend-persistent-storage
+              mountPath: /app/frontend/uploads
+            - name: frontend-persistent-storage
+              mountPath: /app/frontend/results
+      volumes:
+        - name: frontend-persistent-storage
+          persistentVolumeClaim:
+            claimName: frontend-pvc

@@ -1,0 +1,11 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: bank-ocr
+data:
+  FLASK_APP: app.py
+  FLASK_RUN_HOST: 0.0.0.0
+  FLASK_RUN_PORT: "5001"
+  # Add other non-sensitive backend configurations here if needed

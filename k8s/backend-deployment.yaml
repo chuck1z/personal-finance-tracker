@@ -1,0 +1,38 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: bank-ocr
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: finanalyze-backend:latest # Assuming you will build and push this image
+          imagePullPolicy: Never # Use Never for local Kind cluster with locally built images
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secret
+          ports:
+            - containerPort: 5001
+          volumeMounts:
+            - name: backend-persistent-storage
+              mountPath: /app/uploads
+            - name: backend-persistent-storage
+              mountPath: /app/logs
+      volumes:
+        - name: backend-persistent-storage
+          persistentVolumeClaim:
+            claimName: backend-pvc
