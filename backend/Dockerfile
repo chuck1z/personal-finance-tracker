@@ -2,7 +2,7 @@
 # Multi-stage build for Python Flask backend with OCR capabilities
 
 # Stage 1: Base image with system dependencies
-FROM python:3.11-slim as base
+FROM python:3.11-slim-bookworm as base
 
 # Update package lists and install system dependencies
 RUN apt-get update -qq && \
@@ -83,3 +83,4 @@ EXPOSE 5001
 
 # Run the application
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=5001"]
+

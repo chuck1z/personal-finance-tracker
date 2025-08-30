@@ -1,4 +1,3 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,8 +17,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: finanalyze-frontend:latest # Assuming you will build and push this image
-          imagePullPolicy: Never # Use Never for local Kind cluster with locally built images
+          image: finance-tracker-frontend:latest
+          imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: frontend-config
@@ -34,3 +33,4 @@ spec:
         - name: frontend-persistent-storage
           persistentVolumeClaim:
             claimName: frontend-pvc
+
