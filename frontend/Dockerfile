@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM python:3.9-slim-bookworm
 
 WORKDIR /app/frontend
 
@@ -17,4 +17,3 @@ ENV FLASK_RUN_HOST=0.0.0.0
 EXPOSE 5000
 
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=5000"]
-
