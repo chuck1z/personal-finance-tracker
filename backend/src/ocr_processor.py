@@ -1,10 +1,16 @@
 import pytesseract
+from pytesseract import TesseractError
 from PIL import Image
 import pdf2image
+from pdf2image.exceptions import PDFInfoNotInstalledError, PDFPageCountError
 import re
 import pandas as pd
 from datetime import datetime
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class BankStatementOCR:
     def __init__(self, tesseract_cmd=None):
@@ -30,10 +36,10 @@ class BankStatementOCR:
         """
         try:
             images = pdf2image.convert_from_path(pdf_path, dpi=dpi)
-            print(f"Converted {len(images)} pages from PDF")
+            logger.info("Converted %d pages from PDF %s", len(images), pdf_path)
             return images
-        except Exception as e:
-            print(f"Error converting PDF: {e}")
+        except (PDFInfoNotInstalledError, PDFPageCountError, FileNotFoundError) as e:
+            logger.error("Error converting PDF %s: %s", pdf_path, e)
             return []
     
     def preprocess_image(self, image):
@@ -72,13 +78,13 @@ class BankStatementOCR:
             # Preprocess if it's an image object
             if isinstance(image, Image.Image):
                 image = self.preprocess_image(image)
-            
+
             # OCR configuration for better accuracy
             custom_config = r'--oem 3 --psm 6'
             text = pytesseract.image_to_string(image, config=custom_config)
             return text
-        except Exception as e:
-            print(f"Error during OCR: {e}")
+        except (TesseractError, OSError) as e:
+            logger.error("Error during OCR: %s", e)
             return ""
     
     def parse_transactions(self, text):
@@ -172,7 +178,7 @@ class BankStatementOCR:
         if file_path.lower().endswith('.pdf'):
             images = self.pdf_to_images(file_path)
             for i, image in enumerate(images):
-                print(f"Processing page {i+1}...")
+                logger.info("Processing page %d", i + 1)
                 text = self.extract_text(image)
                 all_text += text + "\n"
                 transactions = self.parse_transactions(text)
@@ -200,21 +206,20 @@ class BankStatementOCR:
             df = pd.DataFrame(all_transactions)
             csv_filename = file_path.rsplit('.', 1)[0] + '_transactions.csv'
             df.to_csv(csv_filename, index=False)
-            print(f"Transactions saved to {csv_filename}")
+            logger.info("Transactions saved to %s", csv_filename)
             result['csv_file'] = csv_filename
-        
+
         return result
 
 # Example usage
 if __name__ == "__main__":
-    # Initialize the OCR processor
-    # Uncomment and set path if tesseract is not in PATH
-    # ocr = BankStatementOCR(tesseract_cmd=r'C:\Program Files\Tesseract-OCR\tesseract.exe')
     ocr = BankStatementOCR()
-    
-    # Process a bank statement
     statement_path = "bank_statement.pdf"  # Change to your file path
-    
+
     if os.path.exists(statement_path):
-        print(f"Processing {statement_path}...")
-        result = ocr.process_statement
+        logger.info("Processing %s...", statement_path)
+        result = ocr.process_statement(statement_path)
+        logger.info(result)
+    else:
+        logger.error("Statement file not found")
+

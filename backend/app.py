@@ -1,25 +1,30 @@
 import os
 from datetime import datetime, timedelta
-import json
-import requests
 from sqlalchemy.exc import IntegrityError
 
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import create_access_token, JWTManager, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token,
+    JWTManager,
+    jwt_required,
+    get_jwt_identity,
+)
 from werkzeug.utils import secure_filename
-import pandas as pd
 
 from src.models import db, User, BankStatement, Transaction, ProcessingLog, Bank, TransactionCategory
 from src.auth import create_hashed_password, verify_password, authenticate_user
 from src.ocr_processor import BankStatementOCR
+from src.database import DatabaseConfig
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://finanalyze_user:finanalyze_password@localhost:5432/finanalyze')
+app.config['SQLALCHEMY_DATABASE_URI'] = DatabaseConfig.get_database_uri()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'your-very-strong-jwt-secret-key')
+jwt_secret = os.environ.get('JWT_SECRET_KEY')
+if not jwt_secret:
+    raise RuntimeError('JWT_SECRET_KEY environment variable is not set')
+app.config['JWT_SECRET_KEY'] = jwt_secret
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 jwt = JWTManager(app)
 

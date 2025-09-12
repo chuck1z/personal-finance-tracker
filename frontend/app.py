@@ -54,7 +54,8 @@ def upload_file():
 
         return jsonify(response_data)
     except requests.exceptions.RequestException as e:
-        return jsonify({'error': f'Error communicating with backend: {e}'}), backend_response.status_code if 'backend_response' in locals() else 500
+        status_code = getattr(e.response, 'status_code', 500)
+        return jsonify({'error': f'Error communicating with backend: {e}'}), status_code
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

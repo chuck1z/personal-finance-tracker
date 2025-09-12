@@ -11,12 +11,14 @@ logger = logging.getLogger(__name__)
 
 class DatabaseConfig:
     """Database configuration class"""
-    
+
     @staticmethod
     def get_database_uri():
-        """Get database URI from environment or use default"""
-        return os.getenv('DATABASE_URL', 
-                         'postgresql://postgres:password@localhost:5432/bank_ocr_db')
+        """Get database URI from environment"""
+        db_uri = os.getenv('DATABASE_URL')
+        if not db_uri:
+            raise RuntimeError('DATABASE_URL environment variable is not set')
+        return db_uri
     
     @staticmethod
     def init_app(app):

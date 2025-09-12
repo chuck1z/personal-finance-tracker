@@ -13,7 +13,6 @@ const loading = document.getElementById('loading');
 const errorMessage = document.getElementById('error-message');
 const successMessage = document.getElementById('success-message');
 const resultsSection = document.getElementById('results-section');
-const modal = document.getElementById('modal');
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', function() {
@@ -42,10 +41,6 @@ function setupEventListeners() {
     // Raw text toggle
     document.getElementById('show-raw').addEventListener('click', showRawText);
     document.getElementById('hide-raw').addEventListener('click', hideRawText);
-    
-    // Modal
-    document.querySelector('.close').addEventListener('click', closeModal);
-    document.getElementById('modal-cancel').addEventListener('click', closeModal);
     
     // Prevent default drag behaviors
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -106,7 +101,7 @@ function handleFile(file) {
 function displayFileInfo(file) {
     fileName.textContent = file.name;
     fileSize.textContent = formatFileSize(file.size);
-    fileInfo.classList.add('show');
+    fileInfo.classList.remove('d-none');
 }
 
 function formatFileSize(bytes) {
@@ -131,9 +126,9 @@ async function processFile() {
     
     // Show loading state
     processBtn.disabled = true;
-    loading.classList.add('show');
+    loading.classList.remove('d-none');
     hideMessages();
-    resultsSection.classList.remove('show');
+    resultsSection.classList.add('d-none');
     
     try {
         const response = await fetch('/upload', {
@@ -155,7 +150,7 @@ async function processFile() {
         showError('An error occurred while processing the file');
     } finally {
         processBtn.disabled = false;
-        loading.classList.remove('show');
+        loading.classList.add('d-none');
     }
 }
 
@@ -201,7 +196,7 @@ function displayResults(data) {
     }
     
     // Show results section
-    resultsSection.classList.add('show');
+    resultsSection.classList.remove('d-none');
     
     // Scroll to results
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -209,10 +204,10 @@ function displayResults(data) {
 
 function createInfoItem(label, value) {
     const div = document.createElement('div');
-    div.className = 'info-item';
+    div.className = 'col';
     div.innerHTML = `
-        <div class="info-label">${label}</div>
-        <div class="info-value">${value || 'N/A'}</div>
+        <div class="fw-semibold">${label}</div>
+        <div>${value || 'N/A'}</div>
     `;
     return div;
 }
@@ -259,78 +254,49 @@ async function exportData(format) {
 
 function showRawText() {
     const rawTextCard = document.getElementById('raw-text-card');
-    rawTextCard.style.display = 'block';
+    rawTextCard.classList.remove('d-none');
     rawTextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function hideRawText() {
-    document.getElementById('raw-text-card').style.display = 'none';
+    document.getElementById('raw-text-card').classList.add('d-none');
 }
 
 function showError(message) {
     errorMessage.textContent = message;
-    errorMessage.classList.add('show');
-    successMessage.classList.remove('show');
-    
+    errorMessage.classList.remove('d-none');
+    successMessage.classList.add('d-none');
+
     // Auto-hide after 5 seconds
     setTimeout(() => {
-        errorMessage.classList.remove('show');
+        errorMessage.classList.add('d-none');
     }, 5000);
 }
 
 function showSuccess(message) {
     successMessage.textContent = message;
-    successMessage.classList.add('show');
-    errorMessage.classList.remove('show');
-    
+    successMessage.classList.remove('d-none');
+    errorMessage.classList.add('d-none');
+
     // Auto-hide after 5 seconds
     setTimeout(() => {
-        successMessage.classList.remove('show');
+        successMessage.classList.add('d-none');
     }, 5000);
 }
 
 function hideMessages() {
-    errorMessage.classList.remove('show');
-    successMessage.classList.remove('show');
-}
-
-function showModal(title, message, onConfirm) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-message').textContent = message;
-    modal.style.display = 'block';
-    
-    // Set up confirm button
-    const confirmBtn = document.getElementById('modal-confirm');
-    confirmBtn.onclick = function() {
-        if (onConfirm) onConfirm();
-        closeModal();
-    };
-}
-
-function closeModal() {
-    modal.style.display = 'none';
-}
-
-// Window click event to close modal
-window.onclick = function(event) {
-    if (event.target === modal) {
-        closeModal();
-    }
+    errorMessage.classList.add('d-none');
+    successMessage.classList.add('d-none');
 }
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
-    // Escape key to close modal
-    if (e.key === 'Escape' && modal.style.display === 'block') {
-        closeModal();
-    }
-    
     // Ctrl/Cmd + O to open file dialog
     if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
         e.preventDefault();
         fileInput.click();
     }
-    
+
     // Ctrl/Cmd + Enter to process file
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && selectedFile && !processBtn.disabled) {
         e.preventDefault();
@@ -473,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add search functionality after results are displayed
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
-            if (mutation.target.classList && mutation.target.classList.contains('show')) {
+            if (mutation.target.classList && !mutation.target.classList.contains('d-none')) {
                 if (!document.getElementById('transaction-search')) {
                     addSearchFilter();
                 }
