@@ -28,7 +28,6 @@ bcrypt==4.0.1
 # Utilities
 python-dotenv==1.0.0
 click==8.1.7
-requests
 
 # System dependencies (install separately)
 # poppler-utils (for pdf2image)

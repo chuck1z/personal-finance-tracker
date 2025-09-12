@@ -64,6 +64,14 @@ docker build -t finance-tracker-frontend:latest .
 cd ..
 ```
 
+### Environment Variables
+
+Create a `.env` file based on `.env.example` and set the following variables:
+
+- `DATABASE_URL` – PostgreSQL connection string for the backend.
+- `JWT_SECRET_KEY` – secret key used to sign JWTs.
+- `BACKEND_API_URL` – URL where the frontend can reach the backend API.
+
 ### 3. Set up Kind Cluster
 
 Create a Kind cluster if not already set up:

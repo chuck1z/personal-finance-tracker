@@ -4,110 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bank Statement OCR Processor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏦 Bank Statement OCR Processor</h1>
-            <p>Upload your bank statement PDF or image to extract transaction data automatically</p>
+    <nav class="navbar navbar-light bg-light mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">Bank Statement OCR</span>
         </div>
+    </nav>
 
-        <div class="upload-section">
-            <div class="upload-area" id="upload-area">
+    <div class="container">
+        <header class="text-center mb-4">
+            <h1 class="display-5">🏦 Bank Statement OCR Processor</h1>
+            <p class="text-muted">Upload your bank statement PDF or image to extract transaction data automatically</p>
+        </header>
+
+        <section class="mb-4">
+            <div class="upload-area mb-3" id="upload-area">
                 <div class="upload-icon">📄</div>
                 <div class="upload-text">Drag & Drop your bank statement here</div>
-                <div class="upload-subtext">or click to browse (PDF, PNG, JPG, JPEG - Max 16MB)</div>
+                <div class="text-muted">or click to browse (PDF, PNG, JPG, JPEG - Max 16MB)</div>
             </div>
             <input type="file" id="file-input" accept=".pdf,.png,.jpg,.jpeg">
-            
-            <div class="file-info" id="file-info">
-                <strong>Selected File:</strong> <span id="file-name"></span>
-                <br>
+            <div class="alert alert-secondary d-none" id="file-info">
+                <strong>Selected File:</strong> <span id="file-name"></span><br>
                 <strong>Size:</strong> <span id="file-size"></span>
             </div>
+            <button class="btn btn-primary d-none" id="process-btn">Process Statement</button>
 
-            <button class="process-btn" id="process-btn" style="display: none;">
-                Process Statement
-            </button>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Processing your statement... This may take a moment.</p>
+            <div class="text-center d-none" id="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Processing your statement... This may take a moment.</p>
             </div>
 
-            <div class="error-message" id="error-message"></div>
-            <div class="success-message" id="success-message"></div>
-        </div>
+            <div class="alert alert-danger d-none" id="error-message"></div>
+            <div class="alert alert-success d-none" id="success-message"></div>
+        </section>
 
-        <div class="results-section" id="results-section">
-            <div class="result-card">
-                <div class="result-header">
-                    <h2>Account Information</h2>
+        <section class="d-none" id="results-section">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Account Information
                 </div>
-                <div class="info-grid" id="account-info-grid">
-                    <!-- Account info will be populated here -->
-                </div>
-            </div>
-
-            <div class="result-card">
-                <div class="result-header">
-                    <h2>Extracted Transactions</h2>
-                </div>
-                <div id="transactions-summary">
-                    <p>Total Transactions Found: <span id="transaction-count">0</span></p>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="transactions-table" id="transactions-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactions-tbody">
-                            <!-- Transactions will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="export-buttons">
-                    <button class="export-btn" id="export-csv">Export as CSV</button>
-                    <button class="export-btn" id="export-json">Export as JSON</button>
-                    <button class="export-btn" id="show-raw">Show Raw Text</button>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-2 g-3" id="account-info-grid"></div>
                 </div>
             </div>
 
-            <div class="result-card" id="raw-text-card" style="display: none;">
-                <div class="result-header">
-                    <h2>Raw Extracted Text (Preview)</h2>
+            <div class="card mb-4">
+                <div class="card-header">
+                    Extracted Transactions
                 </div>
-                <div class="raw-text-content">
-                    <pre id="raw-text-preview"></pre>
+                <div class="card-body">
+                    <div id="transactions-summary" class="mb-2">
+                        <p class="mb-0">Total Transactions Found: <span id="transaction-count">0</span></p>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped transactions-table" id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary" id="export-csv">Export as CSV</button>
+                        <button class="btn btn-outline-primary" id="export-json">Export as JSON</button>
+                        <button class="btn btn-outline-secondary" id="show-raw">Show Raw Text</button>
+                    </div>
                 </div>
-                <button class="export-btn" id="hide-raw">Hide Raw Text</button>
             </div>
-        </div>
 
-        <div class="footer">
-            <p>Powered by Tesseract OCR | Processing is done locally for your privacy</p>
-        </div>
+            <div class="card mb-4 d-none" id="raw-text-card">
+                <div class="card-header">
+                    Raw Extracted Text (Preview)
+                </div>
+                <div class="card-body">
+                    <pre id="raw-text-preview" class="small"></pre>
+                    <button class="btn btn-outline-secondary mt-2" id="hide-raw">Hide Raw Text</button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-muted my-4">
+            Powered by Tesseract OCR | Processing is done locally for your privacy
+        </footer>
     </div>
 
-    <!-- Modal for confirmations -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3 id="modal-title">Confirmation</h3>
-            <p id="modal-message"></p>
-            <div class="modal-buttons">
-                <button class="modal-btn modal-confirm" id="modal-confirm">Confirm</button>
-                <button class="modal-btn modal-cancel" id="modal-cancel">Cancel</button>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
+
